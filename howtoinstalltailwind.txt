@@ -1,0 +1,2 @@
+https://www.npmjs.com/package/tailwindcss-react-native
+https://www.youtube.com/watch?v=-MvPbe5ahVg
