@@ -78,7 +78,7 @@ function Exercise(props) {
           <StyledButton
             className="w-8 h-8 flex items-center justify-center text-center text-lg bg-sky-400 border-sky-800 border"
             title="Add"
-            onPress={addHandler.bind(this)}
+            onPress={addHandler}
           />
         </View>
       </View>

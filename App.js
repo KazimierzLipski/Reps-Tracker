@@ -15,7 +15,6 @@ const initExercises = [
 ];
 
 export default function App() {
-  // const [exercises, setExercises] = useState(initExercises);
   return (
     <TailwindProvider>
       <View className="flex flex-1 pt-12 px-4">
