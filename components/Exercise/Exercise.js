@@ -1,33 +1,45 @@
-import { useReducer } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { View, Text, TextInput } from "react-native";
 import StyledButton from "../UI/StyledButton";
 
 function Exercise(props) {
-  const exercise = props.exercise;
-  const adderReducer = (state, action) => {
+  const [doneColor, setDoneColor] = useState("bg-red-700");
+  const { exercise } = props;
+  console.log("Exercise RUNNING");
+
+  const adderReducer = useCallback((state, action) => {
     let amount = 0;
-    if (action.type === "SET") return { ...state, toAdd: enteredText };
+    if (action.type === "SET") return { toAdd: action.value };
     else if (action.type === "ADD") amount = 1;
     else if (action.type === "SUB") amount = -1;
     else if (action.type === "RESET")
       return { ...state, toAdd: (exercise.amountDue / 5).toString() };
     return { ...state, toAdd: (+state.toAdd + amount).toString() };
-  };
-
+  }, []);
   const [toAddState, dispatchToAdd] = useReducer(adderReducer, {
     toAdd: (exercise.amountDue / 5).toString(),
   });
 
-  const addAmountHandler = (enteredText) => {
+  const typeAmountHandler = (enteredText) => {
     dispatchToAdd({ type: "SET", value: enteredText });
   };
 
-  let depends = exercise.amountDue <= exercise.amountDone ? "bg-green-700" : "bg-red-700";
+  useEffect(() => {
+    setDoneColor(
+      exercise.amountDue <= exercise.amountDone ? "bg-green-700" : "bg-red-700"
+    );
+    console.log("Changed color");
+  }, [exercise.amountDone]);
 
   return (
-    <View className="w-full flex justify-center items-center ">
+    <View className="w-72 mx-4 flex justify-center items-center ">
       <View className="rounded-xl p-3 shadow-lg my-3 bg-amber-200 w-72 mx-auto">
-        <Text className={"rounded-xl py-3 shadow-lg my-3 text-md text-center " + depends}>
+        <Text
+          className={
+            "rounded-xl py-3 shadow-lg my-3 text-md text-center text-white " +
+            doneColor
+          }
+        >
           Exercise: {exercise.name} To do: {exercise.amountDue} Done:{" "}
           {exercise.amountDone}
         </Text>
@@ -35,7 +47,7 @@ function Exercise(props) {
           <TextInput
             className="text-center border-spacing-4 border-blue-400 w-8 bg-slate-100 h-8 mx-auto"
             value={toAddState.toAdd}
-            onChangeText={addAmountHandler}
+            onChangeText={typeAmountHandler}
           />
           <StyledButton
             className="w-8 h-8 flex items-center justify-center text-center text-lg bg-sky-400 border-sky-800 border"
@@ -69,4 +81,4 @@ function Exercise(props) {
   );
 }
 
-export default Exercise;
+export default React.memo(Exercise);

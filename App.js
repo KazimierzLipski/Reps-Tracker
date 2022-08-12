@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { View, ScrollView, Text } from "react-native";
 import { TailwindProvider } from 'tailwindcss-react-native';
 import Exercise from "./components/Exercise/Exercise";
@@ -17,8 +17,9 @@ const initExercises = [
 export default function App() {
   const [exercises, setExercises] = useState(initExercises);
 
-  const addHandler = (exercise, toAdd, event) => {
+  const addHandler = useCallback((exercise, toAdd, event) => {
     let tempExercises = [];
+    console.log(exercise, toAdd)
     for(let exe of exercises){
       if(exe.name === exercise.name){
         tempExercises.push({...exe, amountDone: (isNaN(exe.amountDone) ? 0 : +exe.amountDone) + +(isNaN(+toAdd) ? 0 : +toAdd) })
@@ -27,20 +28,22 @@ export default function App() {
       }
     }
     setExercises(tempExercises);
-  }
+  }, [])
 
   useEffect(() => {
     setExercises(initExercises);
-  }, [initExercises]);
+  }, []);
 
   return (
     <TailwindProvider>
       <View className="flex flex-1 pt-12 px-4">
         <View className="flex flex-1 flex-row justify-between items-center mb-6 border-b border-b-zinc-700">
           <ScrollView>
-            {exercises.map((exercise) => (
-              <Exercise key={exercise.name} exercise={exercise} onPressAdd={addHandler}/>
-            ))}
+            <View className="flex flex-wrap flex-row justify-center items-center">
+              {exercises.map((exercise) => (
+                <Exercise key={exercise.name} exercise={exercise} onPressAdd={addHandler}/>
+              ))}
+            </View>
           </ScrollView>
         </View>
       </View>
