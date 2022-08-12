@@ -4,10 +4,10 @@ import StyledButton from "../UI/StyledButton";
 
 function Exercise(props) {
   const [doneColor, setDoneColor] = useState("bg-red-700");
-  const { exercise } = props;
+  const [exercise, setExercise] = useState(props.exercise);
   console.log("Exercise RUNNING");
 
-  const adderReducer = useCallback((state, action) => {
+  const adderReducer = (state, action) => {
     let amount = 0;
     if (action.type === "SET") return { toAdd: action.value };
     else if (action.type === "ADD") amount = 1;
@@ -15,10 +15,15 @@ function Exercise(props) {
     else if (action.type === "RESET")
       return { ...state, toAdd: (exercise.amountDue / 5).toString() };
     return { ...state, toAdd: (+state.toAdd + amount).toString() };
-  }, []);
+  };
   const [toAddState, dispatchToAdd] = useReducer(adderReducer, {
     toAdd: (exercise.amountDue / 5).toString(),
   });
+
+  const addHandler = (event) => {
+    console.log(exercise, toAddState);
+    setExercise({...exercise, amountDone: (isNaN(exercise.amountDone) ? 0 : +exercise.amountDone) + +(isNaN(+toAddState.toAdd) ? 0 : +toAddState.toAdd) });
+  };
 
   const typeAmountHandler = (enteredText) => {
     dispatchToAdd({ type: "SET", value: enteredText });
@@ -73,7 +78,7 @@ function Exercise(props) {
           <StyledButton
             className="w-8 h-8 flex items-center justify-center text-center text-lg bg-sky-400 border-sky-800 border"
             title="Add"
-            onPress={props.onPressAdd.bind(this, exercise, toAddState.toAdd)}
+            onPress={addHandler.bind(this)}
           />
         </View>
       </View>
@@ -81,4 +86,4 @@ function Exercise(props) {
   );
 }
 
-export default React.memo(Exercise);
+export default Exercise;

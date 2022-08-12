@@ -15,33 +15,15 @@ const initExercises = [
 ];
 
 export default function App() {
-  const [exercises, setExercises] = useState(initExercises);
-
-  const addHandler = useCallback((exercise, toAdd, event) => {
-    let tempExercises = [];
-    console.log(exercise, toAdd)
-    for(let exe of exercises){
-      if(exe.name === exercise.name){
-        tempExercises.push({...exe, amountDone: (isNaN(exe.amountDone) ? 0 : +exe.amountDone) + +(isNaN(+toAdd) ? 0 : +toAdd) })
-      } else {
-        tempExercises.push(exe);
-      }
-    }
-    setExercises(tempExercises);
-  }, [])
-
-  useEffect(() => {
-    setExercises(initExercises);
-  }, []);
-
+  // const [exercises, setExercises] = useState(initExercises);
   return (
     <TailwindProvider>
       <View className="flex flex-1 pt-12 px-4">
         <View className="flex flex-1 flex-row justify-between items-center mb-6 border-b border-b-zinc-700">
           <ScrollView>
             <View className="flex flex-wrap flex-row justify-center items-center">
-              {exercises.map((exercise) => (
-                <Exercise key={exercise.name} exercise={exercise} onPressAdd={addHandler}/>
+              {initExercises.map((exercise) => (
+                <Exercise key={exercise.name} exercise={exercise}/>
               ))}
             </View>
           </ScrollView>
