@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { View, Text, TextInput } from "react-native";
+import useHttp from "../../hooks/use-http";
 import StyledButton from "../UI/StyledButton";
 
 function Exercise(props) {
   const [doneColor, setDoneColor] = useState("bg-red-700");
   const [exercise, setExercise] = useState(props.exercise);
-  console.log("Exercise RUNNING");
+  const { isLoading, error, sendRequest} = useHttp();
 
   const adderReducer = (state, action) => {
     let amount = 0;
@@ -20,9 +21,24 @@ function Exercise(props) {
     toAdd: (exercise.amountDue / 5).toString(),
   });
 
+  const adder = amountToAdd => {
+    setExercise(() => {
+      let newExercise = {...exercise, amountDone: (isNaN(exercise.amountDone) ? 0 : +exercise.amountDone) + +(isNaN(+amountToAdd) ? 0 : +amountToAdd) };
+      sendRequest({
+        url: 'https://reps-tracker-default-rtdb.europe-west1.firebasedatabase.app/reps.json',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: { ...newExercise, date: new Date() }
+      }, arg => console.log(arg)); // SET
+      return newExercise});
+  }
+
+
   const addHandler = (event) => {
     console.log(exercise, toAddState);
-    setExercise({...exercise, amountDone: (isNaN(exercise.amountDone) ? 0 : +exercise.amountDone) + +(isNaN(+toAddState.toAdd) ? 0 : +toAddState.toAdd) });
+    adder(toAddState.toAdd)
   };
 
   const typeAmountHandler = (enteredText) => {
@@ -33,6 +49,7 @@ function Exercise(props) {
     setDoneColor(
       exercise.amountDue <= exercise.amountDone ? "bg-green-700" : "bg-red-700"
     );
+    // sendRequest(); // GET DATA
     console.log("Changed color");
   }, [exercise.amountDone]);
 
