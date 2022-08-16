@@ -26,7 +26,7 @@ function Exercise(props) {
       let newExercise = {...exercise, amountDone: (isNaN(exercise.amountDone) ? 0 : +exercise.amountDone) + +(isNaN(+amountToAdd) ? 0 : +amountToAdd) };
       sendRequest({
         url: 'https://reps-tracker-default-rtdb.europe-west1.firebasedatabase.app/reps.json',
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
