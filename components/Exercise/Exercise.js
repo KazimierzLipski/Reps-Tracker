@@ -6,7 +6,10 @@ import StyledButton from "../UI/StyledButton";
 function Exercise(props) {
   const [doneColor, setDoneColor] = useState("bg-red-700");
   const [exercise, setExercise] = useState(props.exercise);
-  const { isLoading, error, sendRequest} = useHttp();
+  const { isLoading, error, sendRequest } = useHttp();
+  let todayISO = new Date().toISOString().substring(0, 10);
+  const URL =
+    "https://reps-tracker-default-rtdb.europe-west1.firebasedatabase.app/reps/";
 
   const adderReducer = (state, action) => {
     let amount = 0;
@@ -21,24 +24,34 @@ function Exercise(props) {
     toAdd: (exercise.amountDue / 5).toString(),
   });
 
-  const adder = amountToAdd => {
+  const adder = (amountToAdd) => {
     setExercise(() => {
-      let newExercise = {...exercise, amountDone: (isNaN(exercise.amountDone) ? 0 : +exercise.amountDone) + +(isNaN(+amountToAdd) ? 0 : +amountToAdd) };
-      sendRequest({
-        url: 'https://reps-tracker-default-rtdb.europe-west1.firebasedatabase.app/reps.json',
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
+      let newExercise = {
+        ...exercise,
+        amountDone:
+          (isNaN(exercise.amountDone) ? 0 : +exercise.amountDone) +
+          +(isNaN(+amountToAdd) ? 0 : +amountToAdd),
+      };
+      sendRequest(
+        {
+          url: URL + todayISO + "/" + newExercise.name + ".json",
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: {
+            amountDone: newExercise.amountDone,
+            amountDue: newExercise.amountDue,
+          },
         },
-        body: { ...newExercise, date: new Date() }
-      }, arg => console.log(arg)); // SET
-      return newExercise});
-  }
-
+        (arg) => {}
+      );
+      return newExercise;
+    });
+  };
 
   const addHandler = (event) => {
-    console.log(exercise, toAddState);
-    adder(toAddState.toAdd)
+    adder(toAddState.toAdd);
   };
 
   const typeAmountHandler = (enteredText) => {
@@ -46,24 +59,44 @@ function Exercise(props) {
   };
 
   useEffect(() => {
-    setDoneColor(
-      exercise.amountDue <= exercise.amountDone ? "bg-green-700" : "bg-red-700"
+    sendRequest(
+      {
+        url: URL + todayISO + "/" + exercise.name + ".json",
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+      (arg) => setExercise({ ...exercise, amountDone: arg.amountDone })
     );
-    // sendRequest(); // GET DATA
-    console.log("Changed color");
+  }, []);
+
+  useEffect(() => {
+    setDoneColor(
+      exercise.amountDue <= exercise.amountDone
+        ? "bg-[#1e6d45]"
+        : "bg-[#90272d]"
+    );
   }, [exercise.amountDone]);
 
+  let content = exercise.amountDone;
+  if (isLoading) {
+    content = "L";
+  } else if (error && exercise.amountDone != 0) {
+    content = "E";
+  }
+
   return (
-    <View className="w-72 mx-4 flex justify-center items-center ">
-      <View className="rounded-xl p-3 shadow-lg my-3 bg-amber-200 w-72 mx-auto">
+    <View className="mx-2 my-2 flex justify-center items-center ">
+      <View className="rounded-xl pb-4 shadow-lg bg-slate-700 w-40">
         <Text
           className={
-            "rounded-xl py-3 shadow-lg my-3 text-md text-center text-white " +
+            "opacity-100 text-opacity-100 text-white rounded-xl py-1 shadow-lg mb-4 text-md text-center " +
             doneColor
           }
         >
-          Exercise: {exercise.name} To do: {exercise.amountDue} Done:{" "}
-          {exercise.amountDone}
+          Exercise: {exercise.name + "\n"} To do: {exercise.amountDue} Done:{" "}
+          {content}
         </Text>
         <View className="flex flex-1 flex-row items-center justify-center">
           <TextInput
@@ -72,31 +105,24 @@ function Exercise(props) {
             onChangeText={typeAmountHandler}
           />
           <StyledButton
-            className="w-8 h-8 flex items-center justify-center text-center text-lg bg-sky-400 border-sky-800 border"
             title="➕"
             onPress={() => {
               dispatchToAdd({ type: "ADD" });
             }}
           />
           <StyledButton
-            className="w-8 h-8 flex items-center justify-center text-center text-lg bg-sky-400 border-sky-800 border"
             title="➖"
             onPress={() => {
               dispatchToAdd({ type: "SUB" });
             }}
           />
           <StyledButton
-            className="w-8 h-8 flex items-center justify-center text-center text-lg bg-sky-400 border-sky-800 border"
             title="🔄"
             onPress={() => {
               dispatchToAdd({ type: "RESET" });
             }}
           />
-          <StyledButton
-            className="w-8 h-8 flex items-center justify-center text-center text-lg bg-sky-400 border-sky-800 border"
-            title="Add"
-            onPress={addHandler}
-          />
+          <StyledButton title="Add" onPress={addHandler} />
         </View>
       </View>
     </View>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { View, ScrollView, Text } from "react-native";
+import { View, ScrollView, Text, StatusBar } from "react-native";
 import { TailwindProvider } from 'tailwindcss-react-native';
 import Exercise from "./components/Exercise/Exercise";
 
@@ -17,8 +17,9 @@ const initExercises = [
 export default function App() {
   return (
     <TailwindProvider>
-      <View className="flex flex-1 pt-12 px-4">
-        <View className="flex flex-1 flex-row justify-between items-center mb-6 border-b border-b-zinc-700">
+      <StatusBar barStyle="light-content"/>
+      <View className="flex flex-1 bg-zinc-800">
+        <View className="flex flex-1 flex-row justify-between mt-6">
           <ScrollView>
             <View className="flex flex-wrap flex-row justify-center items-center">
               {initExercises.map((exercise) => (
@@ -28,6 +29,7 @@ export default function App() {
           </ScrollView>
         </View>
       </View>
+
     </TailwindProvider>
   );
 }
