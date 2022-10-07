@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
-import { View, ScrollView, Text, StatusBar } from "react-native";
-import { TailwindProvider } from 'tailwindcss-react-native';
-import Exercise from "./components/Exercise/Exercise";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Home from "./screens/Home";
+import Charts from "./screens/Charts";
 
 const initExercises = [
   { name: "Push-ups", amountDue: 100, amountDone: 0 },
@@ -14,22 +14,21 @@ const initExercises = [
   { name: "Squats", amountDue: 100, amountDone: 0 },
 ];
 
+// dummy data 
+// const sevenDaysDataPushUps = [97,82,79,100,95,100,91]
+
+// const sevenDaysDataDips = [30,30,29,20,12,28,19]
+
+
+const Stack = createNativeStackNavigator();
+
 export default function App() {
   return (
-    <TailwindProvider>
-      <StatusBar barStyle="light-content"/>
-      <View className="flex flex-1 bg-zinc-800">
-        <View className="flex flex-1 flex-row justify-between mt-6">
-          <ScrollView>
-            <View className="flex flex-wrap flex-row justify-center items-center">
-              {initExercises.map((exercise) => (
-                <Exercise key={exercise.name} exercise={exercise}/>
-              ))}
-            </View>
-          </ScrollView>
-        </View>
-      </View>
-
-    </TailwindProvider>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Charts" component={Charts} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
